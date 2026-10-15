@@ -1,0 +1,6 @@
+{
+  "name": "AI-Powered Tourist Safety Risk Prediction System",
+  "description": "Predicting travel risk before you arrive. Evaluate destination safety through crime history, weather, location factors, explainable AI, emergency services, and safer route recommendations.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

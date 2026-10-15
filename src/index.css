@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme {
+	--color-slate-50: #123b3b;
+	--color-slate-100: #194846;
+	--color-slate-200: #285b57;
+	--color-slate-300: #315d58;
+	--color-slate-400: #526f68;
+	--color-slate-500: #6e8980;
+	--color-slate-600: #a3c4b4;
+	--color-slate-700: #d6e8dd;
+	--color-slate-800: #ffffff;
+	--color-slate-900: #f0f7f3;
+	--color-slate-950: #f8fbf9;
+
+	--color-cyan-50: #f1fff7;
+	--color-cyan-100: #e4f8ed;
+	--color-cyan-200: #c9eedc;
+	--color-cyan-300: #147b70;
+	--color-cyan-400: #0c6b63;
+	--color-cyan-500: #042f32;
+	--color-cyan-600: #063f41;
+	--color-cyan-700: #084f50;
+	--color-cyan-800: #0a5d5a;
+	--color-cyan-900: #0b4947;
+	--color-cyan-950: #073735;
+
+	--color-teal-50: #f2fff7;
+	--color-teal-100: #e3f7ea;
+	--color-teal-200: #c6ecd6;
+	--color-teal-300: #217f69;
+	--color-teal-400: #14705e;
+	--color-teal-500: #0b5b50;
+	--color-teal-600: #084c43;
+	--color-teal-700: #083e38;
+	--color-teal-800: #07332f;
+	--color-teal-900: #062a29;
+	--color-teal-950: #042322;
+
+	--color-blue-50: #f3fbf8;
+	--color-blue-100: #e2f2eb;
+	--color-blue-200: #c7e5d9;
+	--color-blue-300: #38877c;
+	--color-blue-400: #24766d;
+	--color-blue-500: #12665f;
+	--color-blue-600: #0e5754;
+	--color-blue-700: #0c4849;
+	--color-blue-800: #0a3b3d;
+	--color-blue-900: #082f33;
+	--color-blue-950: #06272b;
+
+	--color-rose-300: #be123c;
+	--color-rose-400: #be123c;
+	--color-rose-500: #e11d48;
+	--color-orange-300: #c2410c;
+	--color-orange-400: #c2410c;
+	--color-amber-300: #a16207;
+	--color-amber-400: #a16207;
+	--color-emerald-300: #047857;
+	--color-emerald-400: #047857;
+}
+
+@layer utilities {
+	.text-white {
+		color: #042f32;
+	}
+
+	.text-slate-400 {
+		color: #29483f;
+	}
+
+	.text-slate-500 {
+		color: #315147;
+	}
+
+	.text-slate-600,
+	.text-slate-700 {
+		color: #1f453d;
+	}
+
+	.bg-gradient-to-r.text-white,
+	.bg-gradient-to-tr.text-white,
+	.bg-gradient-to-tr .text-white,
+	.bg-rose-600.text-white,
+	.bg-emerald-600.text-white,
+	.bg-emerald-500.text-white,
+	.bg-blue-500.text-white,
+	.bg-blue-600.text-white,
+	.bg-cyan-500.text-white,
+	[class~="bg-rose-600/90"].text-white {
+		color: #fff;
+	}
+}
