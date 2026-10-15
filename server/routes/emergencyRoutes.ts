@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { db, IEmergencyService } from '../db.js';
 import { resolveLocationMetadata } from '../ml.js';
 import { asyncHandler } from '../asyncHandler.js';
+import { authMiddleware, adminMiddleware } from '../auth.js';
 
 export const emergencyRouter = Router();
 
@@ -103,7 +104,8 @@ emergencyRouter.get('/nearby', asyncHandler(async (req, res) => {
 }));
 
 // POST /api/emergency
-emergencyRouter.post('/', async (req, res) => {
+// emergencyRouter.post('/', async (req, res) => {
+emergencyRouter.post('/', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { name, type, location, latitude, longitude, contact, address, emergencyAvailability } = req.body;
     if (!name || !location) {

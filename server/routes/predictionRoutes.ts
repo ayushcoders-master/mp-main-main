@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { db, IPrediction } from '../db.js';
-import { optionalAuthMiddleware, AuthRequest } from '../auth.js';
+import { optionalAuthMiddleware, authMiddleware, AuthRequest } from '../auth.js';
 import { asyncHandler } from '../asyncHandler.js';
 import { runPythonMLPrediction, resolveLocationMetadata, IMLInputFeatures } from '../ml.js';
 import { getCrimeBaseline } from '../crimeBaseline.js';
+
 
 export const predictionRouter = Router();
 
@@ -134,10 +135,8 @@ predictionRouter.get('/history', optionalAuthMiddleware, asyncHandler<AuthReques
   if (userId) {
     const list = await db.getPredictionsByUserId(userId);
     return res.json({ predictions: list });
-  } else {
-    // If not authenticated, return all sample / demo predictions so guests can explore
-    const all = await db.getAllPredictions();
-    return res.json({ predictions: all });
+    } else {
+    return res.json({ predictions: [] });
   }
 }));
 
@@ -170,7 +169,7 @@ predictionRouter.get('/:id', asyncHandler(async (req, res) => {
 }));
 
 // DELETE /api/prediction/:id
-predictionRouter.delete('/:id', asyncHandler(async (req, res) => {
+predictionRouter.delete('/:id', authMiddleware, asyncHandler(async (req, res) => {
   const success = await db.deletePrediction(req.params.id);
   if (!success) {
     return res.status(404).json({ error: 'Prediction not found' });

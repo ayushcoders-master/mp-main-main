@@ -173,7 +173,7 @@ export const AdminDashboardView: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this crime incident record? This will update ML training weights.')) return;
+    if (!window.confirm('Delete this crime incident record?  ')) return;
     try {
       await adminApi.deleteCrime(id);
       setCrimeList((prev) => prev.filter((c) => c._id !== id));
@@ -185,12 +185,22 @@ export const AdminDashboardView: React.FC = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      if (isEditing && currentId) {
-        await adminApi.updateCrime(currentId, formData);
-      } else {
-        await adminApi.addCrime(formData);
-      }
+   try {
+  const payload = {
+    location: formData.city,
+    crimeType: formData.crimeType,
+    date: formData.date,
+    time: formData.time,
+    latitude: formData.latitude,
+    longitude: formData.longitude,
+    severity: formData.severity,
+    description: `${formData.locationName}: ${formData.description}`
+  };
+  if (isEditing && currentId) {
+    await adminApi.updateCrime(currentId, payload);
+  } else {
+    await adminApi.addCrime(payload);
+  }
       setModalOpen(false);
       loadAdminData();
     } catch (e) {

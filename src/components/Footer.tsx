@@ -22,7 +22,7 @@ export const Footer: React.FC = () => {
             </p>
             <div className="flex items-center gap-2 text-[11px] text-cyan-400/90 font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span>Python ML Microservice (XGBoost Ensemble) Online</span>
+              {/* <span>Python ML Microservice (XGBoost Ensemble) Online</span> */}
             </div>
           </div>
 

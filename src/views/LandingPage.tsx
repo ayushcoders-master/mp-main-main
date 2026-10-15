@@ -62,7 +62,7 @@ export const LandingPage: React.FC = () => {
 
   const processSteps = [
     { step: '01', title: 'Enter Destination', desc: 'Select target city, travel date, arrival time, and traveler profile.' },
-    { step: '02', title: 'Analyze Risk', desc: 'Python ML service aggregates crime logs, weather, and time vulnerability.' },
+    { step: '02', title: 'Analyze Risk', desc: ' weather, and time vulnerability.' },
     { step: '03', title: 'Get Recommendations', desc: 'Review Explainable AI breakdown, safe corridors, and emergency stations.' },
     { step: '04', title: 'Travel Safer', desc: 'Depart with verified situational awareness and active safety routing.' }
   ];

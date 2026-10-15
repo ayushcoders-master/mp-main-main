@@ -90,7 +90,9 @@ export interface IMLPredictionResult {
 function parseTimeOfDay(timeStr?: string): { hour: number; phase: 'day' | 'evening' | 'late_night' | 'early_morning' } {
   if (!timeStr) return { hour: 14, phase: 'day' };
   const parts = timeStr.split(':');
-  const hour = parseInt(parts[0], 10) || 14;
+  // const hour = parseInt(parts[0], 10) || 14;
+  const parsedHour = parseInt(parts[0], 10);
+const hour = Number.isNaN(parsedHour) ? 14 : parsedHour;
   if (hour >= 6 && hour < 18) return { hour, phase: 'day' };
   if (hour >= 18 && hour < 22) return { hour, phase: 'evening' };
   if (hour >= 22 || hour < 4) return { hour, phase: 'late_night' };

@@ -128,7 +128,7 @@ export const ExplainableAI: React.FC<ExplainableAIProps> = ({
       <div className="mt-5 p-3.5 rounded-xl bg-slate-900/50 border border-slate-700/40 flex items-start gap-3 text-xs text-slate-400">
         <HelpCircle className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
         <p className="leading-relaxed">
-          <strong className="text-slate-300 font-medium">Explainable Machine Learning Transparency:</strong> Rather than a black-box risk rating, our model evaluates historical police databases, temporal crime spikes, meteorology, and localized vulnerability index to deliver actionable, transparent travel insights.
+          <strong className="text-slate-300 font-medium">Explainable Machine Learning Transparency:</strong> “Risk score = NCRB crime baseline + time, weather, transport and group factors. Each factor’s contribution is shown above.”
         </p>
       </div>
     </div>

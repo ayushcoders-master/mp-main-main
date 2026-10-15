@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { db } from '../db.js';
 import { resolveLocationMetadata } from '../ml.js';
 import { asyncHandler } from '../asyncHandler.js';
+import { authMiddleware, adminMiddleware } from '../auth.js';
 
 export const crimeRouter = Router();
 
@@ -17,7 +18,8 @@ crimeRouter.get('/', asyncHandler(async (req, res) => {
 }));
 
 // POST /api/crime
-crimeRouter.post('/', async (req, res) => {
+// crimeRouter.post('/', async (req, res) => {
+crimeRouter.post('/', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { location, latitude, longitude, crimeType, severity, date, time, description } = req.body;
 
@@ -54,7 +56,8 @@ crimeRouter.post('/', async (req, res) => {
 });
 
 // PUT /api/crime/:id
-crimeRouter.put('/:id', async (req, res) => {
+// crimeRouter.put('/:id', async (req, res) => {
+crimeRouter.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const { location, latitude, longitude, crimeType, severity, date, time, description } = req.body;
@@ -84,7 +87,8 @@ crimeRouter.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/crime/:id
-crimeRouter.delete('/:id', asyncHandler(async (req, res) => {
+// crimeRouter.delete('/:id', asyncHandler(async (req, res) => {
+crimeRouter.delete('/:id', authMiddleware, adminMiddleware, asyncHandler(async (req, res) => {
   const { id } = req.params;
   const deleted = await db.deleteCrimeData(id);
   if (!deleted) {

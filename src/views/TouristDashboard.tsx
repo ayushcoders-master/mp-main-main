@@ -368,13 +368,15 @@ export const TouristDashboard: React.FC = () => {
     }));
   };
 
-  const currentRisk: RiskLevel = activeProfile
-    ? activeProfile.riskLevel
-    : prediction?.riskLevel === 'CRITICAL' || prediction?.riskLevel === 'HIGH'
+const currentRisk: RiskLevel = prediction
+  ? (prediction.riskLevel === 'CRITICAL' || prediction.riskLevel === 'HIGH'
       ? 'HIGH'
-      : prediction?.riskLevel === 'MODERATE'
+      : prediction.riskLevel === 'MODERATE'
         ? 'MODERATE'
-        : 'LOW';
+        : 'LOW')
+  : activeProfile
+    ? activeProfile.riskLevel
+    : 'LOW';
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-teal-500 selection:text-white">
