@@ -228,7 +228,7 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <h2 className="text-2xl font-bold text-white tracking-tight">
-            Sign In to TouristSafety
+            Sign In to AI TripShield
           </h2>
 
           <p className="text-xs text-slate-400 mt-1">

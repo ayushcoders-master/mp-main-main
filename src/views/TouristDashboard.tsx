@@ -77,13 +77,15 @@ function describeWeatherCode(code: number): string {
 const riskTextColors: Record<RiskLevel, string> = {
   LOW: 'text-emerald-400',
   MODERATE: 'text-amber-400',
-  HIGH: 'text-rose-400'
+  HIGH: 'text-orange-400',
+  CRITICAL: 'text-rose-400'
 };
 
 const riskBorderColors: Record<RiskLevel, string> = {
   LOW: 'border-emerald-500/40 text-emerald-300 bg-emerald-500/10',
   MODERATE: 'border-amber-500/40 text-amber-300 bg-amber-500/10',
-  HIGH: 'border-rose-500/40 text-rose-300 bg-rose-500/10'
+  HIGH: 'border-orange-500/40 text-orange-300 bg-orange-500/10',
+  CRITICAL: 'border-rose-500/40 text-rose-300 bg-rose-500/10'
 };
 
 /**
@@ -102,7 +104,7 @@ const PlacePhoto: React.FC<{
   image,
   placeName,
   city = '',
-  kind = 'place',
+  kind = 'place' as 'place' | 'city',
   className = 'w-24 aspect-[4/3] shrink-0'
 }) => {
   const storedUrl = typeof image === 'string' ? image.trim() : '';
@@ -195,6 +197,9 @@ export const TouristDashboard: React.FC = () => {
   // Travel parameters for Risk Assessment
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState('14:00');
+  const [travelWindow, setTravelWindow] = useState<'day' | 'night' | 'both'>('day');
+  const [travelParty, setTravelParty] = useState<'solo' | 'friends' | 'family' | 'group' | 'business'>('solo');
+  const [plannedTransport, setPlannedTransport] = useState<'walking' | 'public_transport' | 'taxi' | 'bike_taxi' | 'rental' | 'private_vehicle'>('public_transport');
   const [touristCategory, setTouristCategory] = useState<TouristCategory>(
     user?.touristCategory || 'Solo Traveler'
   );
@@ -254,6 +259,8 @@ export const TouristDashboard: React.FC = () => {
 
     setLoading(true);
     setError(null);
+    setPrediction(null);
+    setEmergencyData(null);
     setSearchedCity(trimmed);
     setDestinationInput(trimmed);
     setSearchParams({ dest: trimmed }, { replace: true });
@@ -268,11 +275,9 @@ export const TouristDashboard: React.FC = () => {
     const cityCoords = INDIAN_CITIES.find(
       (c) => c.name.toLowerCase() === trimmed.toLowerCase()
     );
-    const lat = cityCoords ? cityCoords.lat : 28.6139;
-    const lng = cityCoords ? cityCoords.lng : 77.2090;
-
-    setWeatherLoading(true);
-    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m&timezone=auto`)
+    setWeatherLoading(Boolean(cityCoords));
+    if (cityCoords) {
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${cityCoords.lat}&longitude=${cityCoords.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m&timezone=auto`)
       .then((res) => {
         if (!res.ok) throw new Error('Weather fetch failed');
         return res.json();
@@ -293,14 +298,21 @@ export const TouristDashboard: React.FC = () => {
         setLiveWeather(null);
       })
       .finally(() => setWeatherLoading(false));
+    } else {
+      setLiveWeather(null);
+    }
 
-    // 2. Fetch ML Safety Prediction & Emergency Services in parallel
+    // Fetch the risk score and emergency services in parallel.
     try {
       const [predResult, emgResult] = await Promise.all([
         predictionApi.predict({
           destination: trimmed,
           date,
           time,
+          travelWindow,
+          travelParty,
+          travellerCount: travelParty === 'solo' ? 1 : 2,
+          plannedTransport,
           weather: 'Clear',
           touristCategory
         }),
@@ -314,7 +326,10 @@ export const TouristDashboard: React.FC = () => {
       });
     } catch (err: any) {
       console.error('Error fetching destination data:', err);
-      setError(err.response?.data?.error || 'Unable to retrieve data for this destination. Please check your query and retry.');
+      const apiError = err.response?.data?.error;
+      setError(apiError === 'Location not found in our supported destinations'
+        ? 'We could not find this destination in the supported list. Try a listed Indian city such as Delhi, Goa, or Jaipur.'
+        : apiError || 'Unable to retrieve data for this destination. Please check your query and retry.');
     } finally {
       setLoading(false);
     }
@@ -345,17 +360,26 @@ export const TouristDashboard: React.FC = () => {
   const handleRecalculateRisk = async () => {
     if (!searchedCity) return;
     setCalculatingRisk(true);
+    setError(null);
     try {
       const predResult = await predictionApi.predict({
         destination: searchedCity,
         date,
         time,
+        travelWindow,
+        travelParty,
+        travellerCount: travelParty === 'solo' ? 1 : 2,
+        plannedTransport,
         weather: liveWeather ? (liveWeather.weatherCode >= 50 ? 'Rain' : 'Clear') : 'Clear',
         touristCategory
       });
       setPrediction(predResult.prediction);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to calculate travel risk:', err);
+      const apiError = err.response?.data?.error;
+      setError(apiError === 'Location not found in our supported destinations'
+        ? 'We could not find this destination in the supported list. Try a listed Indian city such as Delhi, Goa, or Jaipur.'
+        : apiError || 'Unable to update the risk score. Please try again.');
     } finally {
       setCalculatingRisk(false);
     }
@@ -369,11 +393,7 @@ export const TouristDashboard: React.FC = () => {
   };
 
 const currentRisk: RiskLevel = prediction
-  ? (prediction.riskLevel === 'CRITICAL' || prediction.riskLevel === 'HIGH'
-      ? 'HIGH'
-      : prediction.riskLevel === 'MODERATE'
-        ? 'MODERATE'
-        : 'LOW')
+  ? prediction.riskLevel
   : activeProfile
     ? activeProfile.riskLevel
     : 'LOW';
@@ -507,7 +527,7 @@ const currentRisk: RiskLevel = prediction
                 <span>Explainable Safety Risk</span>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Ensemble models assess crime trends, weather factors, and tourist categories into actionable safe travel guidance.
+                The rule-based score combines an NCRB crime baseline with the travel context you select.
               </p>
             </div>
           </div>
@@ -632,7 +652,7 @@ const currentRisk: RiskLevel = prediction
                   {currentRisk} Risk ({prediction?.riskScore || activeProfile?.riskScore || 45}/100)
                 </div>
                 <span className="text-slate-400 block text-[11px]">
-                  Calibrated for {touristCategory}
+                  Traveler profile: {touristCategory}
                 </span>
               </div>
 
@@ -1230,7 +1250,7 @@ const currentRisk: RiskLevel = prediction
                 Configure Your Travel Parameters:
               </span>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                 <div>
                   <label className="text-slate-400 block mb-1">Travel Date</label>
                   <input
@@ -1246,7 +1266,12 @@ const currentRisk: RiskLevel = prediction
                   <input
                     type="time"
                     value={time}
-                    onChange={(e) => setTime(e.target.value)}
+                    onChange={(e) => {
+                      const nextTime = e.target.value;
+                      setTime(nextTime);
+                      const hour = Number(nextTime.split(':')[0]);
+                      setTravelWindow(hour >= 18 || hour < 6 ? 'night' : 'day');
+                    }}
                     className="w-full p-2 rounded bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-teal-400"
                   />
                 </div>
@@ -1263,6 +1288,55 @@ const currentRisk: RiskLevel = prediction
                         {cat}
                       </option>
                     ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-slate-400 block mb-1">Travel Window</label>
+                  <select
+                    value={travelWindow}
+                    onChange={(e) => {
+                      const nextWindow = e.target.value as 'day' | 'night' | 'both';
+                      setTravelWindow(nextWindow);
+                      if (nextWindow === 'day') setTime('14:00');
+                      if (nextWindow === 'night') setTime('23:00');
+                    }}
+                    className="w-full p-2 rounded bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-teal-400"
+                  >
+                    <option value="day">Day</option>
+                    <option value="night">Night</option>
+                    <option value="both">Day and evening</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-slate-400 block mb-1">Travel Party</label>
+                  <select
+                    value={travelParty}
+                    onChange={(e) => setTravelParty(e.target.value as typeof travelParty)}
+                    className="w-full p-2 rounded bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-teal-400"
+                  >
+                    <option value="solo">Solo</option>
+                    <option value="friends">Friends</option>
+                    <option value="family">Family</option>
+                    <option value="group">Group</option>
+                    <option value="business">Business</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-slate-400 block mb-1">Planned Transport</label>
+                  <select
+                    value={plannedTransport}
+                    onChange={(e) => setPlannedTransport(e.target.value as typeof plannedTransport)}
+                    className="w-full p-2 rounded bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-teal-400"
+                  >
+                    <option value="walking">Walking</option>
+                    <option value="public_transport">Public transport</option>
+                    <option value="taxi">Taxi</option>
+                    <option value="bike_taxi">Bike taxi</option>
+                    <option value="rental">Rental vehicle</option>
+                    <option value="private_vehicle">Private vehicle</option>
                   </select>
                 </div>
               </div>

@@ -34,7 +34,7 @@ async function startServer() {
   app.get('/api/health', (req, res) => {
     res.json({
       status: 'online',
-      system: 'AI-Powered Tourist Safety Risk Prediction System',
+      system: 'AI TripShield',
       version: '1.0.0',
       timestamp: new Date().toISOString()
     });
@@ -56,6 +56,7 @@ async function startServer() {
 
   // Vite middleware for development vs Static files for production
   if (process.env.NODE_ENV !== 'production') {
+    app.use(express.static(path.join(process.cwd(), 'public')));
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -77,7 +78,7 @@ async function startServer() {
   });
 
   const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Tourist Safety System running on http://localhost:${PORT}`);
+    console.log(`AI TripShield running on http://localhost:${PORT}`);
   });
 
   const shutdown = () => {

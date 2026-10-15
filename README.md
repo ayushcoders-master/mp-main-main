@@ -1,4 +1,4 @@
-# AI-Powered Tourist Safety Risk Prediction System
+# AI TripShield
 
 Full-stack app (React + Vite + Express + **MongoDB**) that estimates travel risk for Indian destinations, with explainable risk factors, a safety map, emergency services, driving routes and traveller reviews.
 
@@ -59,13 +59,39 @@ Risk baselines come from the National Crime Records Bureau's **Crime in India 20
 
 - **Metro cities (19):** Ahmedabad, Bengaluru, Chennai, Coimbatore, Delhi, Ghaziabad, Hyderabad, Indore, Jaipur, Kanpur, Kochi, Kolkata, Kozhikode, Lucknow, Mumbai, Nagpur, Patna, Pune, Surat. Uses city-level IPC crime rate per lakh population plus murder, robbery, kidnapping and theft rates (Tables 1B.1 and 1B.4), and women / cyber crime rates from the NCRB metro tables.
 - **Other destinations (Goa, Manali, Agra, Varanasi, ...):** NCRB has no city table, so the state-level rate is used as a proxy and the result is labelled lower-confidence (`shared/cityStateMap.ts` maps destinations to states).
-- **Anything else:** a neutral 50/50 baseline, clearly labelled "no NCRB data".
+- **Supported destinations without a matching city/state statistic:** a neutral 50/50 baseline, clearly labelled "no NCRB data". Destinations outside the supported list are rejected instead of being assigned invented coordinates.
 
 How the 0-100 inputs are computed (`server/crimeStats.ts`):
 - `frequencyScore` = percentile rank of the IPC crime rate per lakh within its group (19 metros, or 36 States/UTs).
 - `severityScore` = percentile ranks of murder (40%), robbery (30%) and kidnapping (30%) rates, weighted.
 
 Limits to state in your report: scores are *relative* (a city at 0 is the lowest of the 19, not "zero risk"); NCRB warns that cities and states are not strictly comparable because reporting practices differ (e.g. online FIR for theft in Delhi, Kerala); the data is a 2022 snapshot; the risk model itself is a rule-based weighting, not a trained ML model.
+
+## How the risk score is calculated
+
+The model adds the NCRB baseline and selected travel-context contributions, rounds the raw result, then clamps the final score to 8-94. The NCRB inputs are relative percentile scores; all context weights below are expert judgments, not values learned from training data.
+
+- Crime baseline: `frequency × 0.40 + severity × 0.35`.
+- Time: day `0`, early morning `4`, evening/mixed `9`, night `17.5`.
+- Weather: clear `0`, heat `4`, rain/fog `6.5`, storm/cyclone/heavy rain `13`.
+- Transport: walking `4` by day or `10` at night; bike taxi `6.5`; rental `5`; taxi/public transport `1`.
+- Travel party: solo `4`, family `1.5`, group `-1.5`, and groups of three or more friends `-2`.
+- Recent local incident records: `2.5` each, capped at `12` points.
+
+The final tiers are LOW below 42, MODERATE from 42-74, HIGH from 75-84, and CRITICAL from 85 onward.
+
+Worked example: Delhi, night, walking, solo, clear weather, and no local incident records. Delhi's NCRB 2022 baseline is frequency `100` and severity `91.1`.
+
+- Crime baseline: `(100 × 0.40) + (91.1 × 0.35) = 71.885` points.
+- Night exposure: `17.5` points.
+- Walking at night: `10` points.
+- Clear weather: `0` points.
+- Solo party plus zero recent records: `4 + 0 = 4` points.
+- Raw total: `71.885 + 17.5 + 10 + 0 + 4 = 103.385`; rounded and capped final score: `94/100 (CRITICAL)`.
+
+## Testing
+
+Run the database-free risk-model suite with `npm test`. It covers day/night and weather comparisons, score caps, baseline defaults, all four risk tiers, day/night comparison levels, unsupported locations, and factor reconciliation against the unclamped raw score. Run `npm run lint` for the TypeScript check.
 
 To rebuild the JSON from the NCRB volumes: `python3 scripts/extract_ncrb.py --vol1 vol1.txt --women women.csv --cyber cyber.csv` (it checks every parsed column against NCRB's own totals). Sources: [Crime in India 2022 on OpenCity](https://data.opencity.in/dataset/crime-in-india-2022) (public domain) and [ncrb.gov.in](https://ncrb.gov.in/crime-in-india.html).
 

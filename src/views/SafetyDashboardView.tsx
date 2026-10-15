@@ -235,7 +235,7 @@ export const SafetyDashboardView: React.FC = () => {
               </span>
               <div>
                 <h3 className="text-base font-bold text-slate-100">
-                  AI Safety Recommendations for {prediction.touristCategory}
+                  Safety Recommendations for {prediction.touristCategory}
                 </h3>
                 <p className="text-xs text-slate-400">
                   Adaptive precautions based on your selected travel window and destination severity.

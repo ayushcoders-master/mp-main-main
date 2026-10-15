@@ -31,11 +31,11 @@ export const LandingPage: React.FC = () => {
 
   const featureCards = [
     {
-      title: 'AI Risk Prediction',
+      title: 'Explainable Risk Score',
       icon: Activity,
       color: 'from-cyan-500/20 to-blue-500/20 text-cyan-400 border-cyan-500/30',
       description:
-        'Ensemble XGBoost and Random Forest algorithms predict comprehensive risk score (0-100) and discrete risk tier for any target city.'
+        'Transparent expert-selected weights combine NCRB 2022 crime baselines with your selected travel context into a 0-100 advisory score.'
     },
     {
       title: 'Safer Route Recommendation',
@@ -63,7 +63,7 @@ export const LandingPage: React.FC = () => {
   const processSteps = [
     { step: '01', title: 'Enter Destination', desc: 'Select target city, travel date, arrival time, and traveler profile.' },
     { step: '02', title: 'Analyze Risk', desc: ' weather, and time vulnerability.' },
-    { step: '03', title: 'Get Recommendations', desc: 'Review Explainable AI breakdown, safe corridors, and emergency stations.' },
+    { step: '03', title: 'Get Recommendations', desc: 'Review the explainable risk breakdown, safe corridors, and emergency stations.' },
     { step: '04', title: 'Travel Safer', desc: 'Depart with verified situational awareness and active safety routing.' }
   ];
 
@@ -83,7 +83,7 @@ export const LandingPage: React.FC = () => {
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 border border-slate-700/80 text-xs text-cyan-300 shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span>Explainable AI Machine Learning Safety Platform</span>
+                <span>Explainable, rule-based safety scoring</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
@@ -94,7 +94,7 @@ export const LandingPage: React.FC = () => {
               </h1>
 
               <p className="text-lg sm:text-xl text-slate-300 max-w-2xl font-normal leading-relaxed mx-auto lg:mx-0">
-                AI-powered tourist safety prediction before you travel. Evaluate destination crime history, temporal risk, weather impact, emergency hubs, and verified safer routes.
+                Review a rule-based tourist safety score built on NCRB 2022 crime baselines and your selected travel context, alongside emergency services and route guidance.
               </p>
 
               {/* Primary & Secondary Buttons */}
@@ -232,7 +232,7 @@ export const LandingPage: React.FC = () => {
               Engineered for Complete Situational Awareness
             </h3>
             <p className="text-sm text-slate-400 mt-2">
-              Combining predictive machine learning with geospatial safety parameters.
+              Combining NCRB crime baselines with transparent, expert-selected travel-context weights.
             </p>
           </div>
 

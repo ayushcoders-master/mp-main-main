@@ -145,15 +145,15 @@ export const RiskMeter: React.FC<RiskMeterProps> = ({ score, level, size = 'md',
       {/* Visual Indicator Bar */}
       <div className="w-full max-w-xs mt-3">
         <div className="h-2 w-full bg-slate-700/60 rounded-full overflow-hidden p-0.5 flex gap-1">
-          <div className={`h-full rounded-full transition-all duration-700 ${safeScore < 35 ? 'bg-emerald-500' : 'bg-emerald-500/30'}`} style={{ width: '35%' }} title="Low Risk (0-35)" />
-          <div className={`h-full rounded-full transition-all duration-700 ${safeScore >= 35 && safeScore < 65 ? 'bg-amber-500' : 'bg-amber-500/30'}`} style={{ width: '30%' }} title="Moderate Risk (35-65)" />
-          <div className={`h-full rounded-full transition-all duration-700 ${safeScore >= 65 && safeScore < 85 ? 'bg-orange-500' : 'bg-orange-500/30'}`} style={{ width: '20%' }} title="High Risk (65-85)" />
+          <div className={`h-full rounded-full transition-all duration-700 ${safeScore < 42 ? 'bg-emerald-500' : 'bg-emerald-500/30'}`} style={{ width: '42%' }} title="Low Risk (0-41)" />
+          <div className={`h-full rounded-full transition-all duration-700 ${safeScore >= 42 && safeScore < 75 ? 'bg-amber-500' : 'bg-amber-500/30'}`} style={{ width: '33%' }} title="Moderate Risk (42-74)" />
+          <div className={`h-full rounded-full transition-all duration-700 ${safeScore >= 75 && safeScore < 85 ? 'bg-orange-500' : 'bg-orange-500/30'}`} style={{ width: '10%' }} title="High Risk (75-84)" />
           <div className={`h-full rounded-full transition-all duration-700 ${safeScore >= 85 ? 'bg-rose-500' : 'bg-rose-500/30'}`} style={{ width: '15%' }} title="Critical Risk (85-100)" />
         </div>
         <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-mono">
           <span>0 (Safe)</span>
-          <span>35</span>
-          <span>65</span>
+          <span>42</span>
+          <span>75</span>
           <span>85</span>
           <span>100 (Critical)</span>
         </div>

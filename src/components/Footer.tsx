@@ -14,15 +14,14 @@ export const Footer: React.FC = () => {
                 <Shield className="w-4 h-4" />
               </div>
               <span className="text-base font-bold text-slate-100">
-                AI-Powered Tourist Safety Risk Prediction System
+                AI TripShield
               </span>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed max-w-md">
-              “Predicting travel risk before you arrive.” Developed as a Computer Science final year mini project integrating machine learning, spatial safety analytics, emergency services routing, and explainable AI.
+              “Plan with clearer context before you travel.” A Computer Science final-year project combining NCRB 2022 crime baselines, rule-based risk scoring, emergency-service information, and safer-route guidance.
             </p>
             <div className="flex items-center gap-2 text-[11px] text-cyan-400/90 font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              {/* <span>Python ML Microservice (XGBoost Ensemble) Online</span> */}
             </div>
           </div>
 
@@ -54,7 +53,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link to="/recommendations" className="hover:text-cyan-400 transition-colors">
-                  AI Safety Recommendations
+                  Safety Recommendations
                 </Link>
               </li>
               <li>
@@ -85,7 +84,7 @@ export const Footer: React.FC = () => {
         {/* Bottom bar */}
         <div className="pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500 text-[11px]">
           <div>
-            &copy; {new Date().getFullYear()} AI-Powered Tourist Safety Risk Prediction System. All rights reserved.
+            &copy; {new Date().getFullYear()} AI TripShield. All rights reserved.
           </div>
           <div className="flex items-center gap-4">
             <Link to="/admin" className="hover:text-slate-300">

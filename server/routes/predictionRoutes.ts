@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { db, IPrediction } from '../db.js';
 import { optionalAuthMiddleware, authMiddleware, AuthRequest } from '../auth.js';
 import { asyncHandler } from '../asyncHandler.js';
-import { runPythonMLPrediction, resolveLocationMetadata, IMLInputFeatures } from '../ml.js';
+import { computeRiskScore, resolveLocationMetadata, RiskInputFeatures } from '../riskModel.js';
 import { getCrimeBaseline } from '../crimeBaseline.js';
 
 
@@ -36,6 +36,9 @@ predictionRouter.post('/predict', optionalAuthMiddleware, async (req: AuthReques
     }
 
     const locMeta = resolveLocationMetadata(destination.trim());
+    if (!locMeta) {
+      return res.status(404).json({ error: 'Location not found in our supported destinations' });
+    }
     const existingCrimeRecords = await db.getCrimeDataByLocation(destination.trim());
 
     // Crime baseline from NCRB "Crime in India 2022" (city table, else state-level proxy, else neutral)
@@ -45,7 +48,7 @@ predictionRouter.post('/predict', optionalAuthMiddleware, async (req: AuthReques
 
     const effectiveCategory = touristCategory || (travelParty === 'solo' ? 'Solo Traveler' : (req.user?.touristCategory || 'Solo Traveler'));
 
-    const mlFeatures: IMLInputFeatures = {
+    const riskFeatures: RiskInputFeatures = {
       location: destination.trim(),
       date: startDate || date || new Date().toISOString().split('T')[0],
       time: time || '14:00',
@@ -69,8 +72,7 @@ predictionRouter.post('/predict', optionalAuthMiddleware, async (req: AuthReques
       accessibilityNeeds
     };
 
-    // Run ML Evaluation Engine
-    const mlResult = await runPythonMLPrediction(mlFeatures);
+    const riskResult = await computeRiskScore(riskFeatures);
 
     // Save prediction in DB
     const savedPrediction = await db.createPrediction({
@@ -79,22 +81,22 @@ predictionRouter.post('/predict', optionalAuthMiddleware, async (req: AuthReques
       location: destination.trim(),
       latitude: locMeta.lat,
       longitude: locMeta.lng,
-      date: mlFeatures.date || new Date().toISOString().split('T')[0],
-      time: mlFeatures.time || '14:00',
-      weather: mlFeatures.weather || 'Clear',
+      date: riskFeatures.date || new Date().toISOString().split('T')[0],
+      time: riskFeatures.time || '14:00',
+      weather: riskFeatures.weather || 'Clear',
       touristCategory: effectiveCategory,
-      riskScore: mlResult.riskScore,
-      riskLevel: mlResult.riskLevel,
-      factors: mlResult.factors,
-      recommendations: mlResult.recommendations
+      riskScore: riskResult.riskScore,
+      riskLevel: riskResult.riskLevel,
+      factors: riskResult.factors,
+      recommendations: riskResult.recommendations
     });
 
     const predictionWithDetails = {
       ...savedPrediction,
-      dayNightConsiderations: mlResult.dayNightConsiderations,
-      practicalPrecautions: mlResult.practicalPrecautions,
-      saferTransportSuggestions: mlResult.saferTransportSuggestions,
-      dataFreshnessDisclaimer: mlResult.dataFreshnessDisclaimer
+      dayNightConsiderations: riskResult.dayNightConsiderations,
+      practicalPrecautions: riskResult.practicalPrecautions,
+      saferTransportSuggestions: riskResult.saferTransportSuggestions,
+      dataFreshnessDisclaimer: riskResult.dataFreshnessDisclaimer
     };
 
     const nearbyCrimes = existingCrimeRecords.slice(0, 5);
@@ -103,11 +105,11 @@ predictionRouter.post('/predict', optionalAuthMiddleware, async (req: AuthReques
     return res.status(200).json({
       success: true,
       prediction: predictionWithDetails,
-      modelUsed: mlResult.modelUsed,
-      dayNightConsiderations: mlResult.dayNightConsiderations,
-      practicalPrecautions: mlResult.practicalPrecautions,
-      saferTransportSuggestions: mlResult.saferTransportSuggestions,
-      dataFreshnessDisclaimer: mlResult.dataFreshnessDisclaimer,
+      modelUsed: riskResult.modelUsed,
+      dayNightConsiderations: riskResult.dayNightConsiderations,
+      practicalPrecautions: riskResult.practicalPrecautions,
+      saferTransportSuggestions: riskResult.saferTransportSuggestions,
+      dataFreshnessDisclaimer: riskResult.dataFreshnessDisclaimer,
 
       dataQuality: {
         status: `ncrb-2022-${baseline.scope}`,
@@ -162,8 +164,8 @@ predictionRouter.get('/:id', asyncHandler(async (req, res) => {
     crimeTrend: [],
     nearbyCrimes,
     coordinates: {
-      lat: pred.latitude || locMeta.lat,
-      lng: pred.longitude || locMeta.lng
+      lat: pred.latitude || locMeta?.lat || 0,
+      lng: pred.longitude || locMeta?.lng || 0
     }
   });
 }));

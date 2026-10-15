@@ -1,4 +1,4 @@
-export type RiskLevel = 'LOW' | 'MODERATE' | 'HIGH';
+export type RiskLevel = 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL';
 
 export interface TravelExpense {
   label: string;

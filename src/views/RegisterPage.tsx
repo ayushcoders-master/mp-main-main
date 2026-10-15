@@ -60,7 +60,7 @@ export const RegisterPage: React.FC = () => {
             <Shield className="w-6 h-6" />
           </div>
           <h2 className="text-2xl font-bold text-white tracking-tight">
-            Create Tourist Safety Account
+            Create AI TripShield Account
           </h2>
           <p className="text-xs text-slate-400 mt-1">
             Join to receive ML-powered risk assessments and personalized safety advisory.

@@ -1,10 +1,20 @@
 import { Router } from 'express';
 import { db } from '../db.js';
-import { resolveLocationMetadata } from '../ml.js';
+import { resolveLocationMetadata } from '../riskModel.js';
 import { asyncHandler } from '../asyncHandler.js';
 import { authMiddleware, adminMiddleware } from '../auth.js';
 
 export const crimeRouter = Router();
+
+function stableIncidentOffset(value: string): [number, number] {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index++) {
+    hash = Math.imul(hash ^ value.charCodeAt(index), 16777619);
+  }
+  const latitudeOffset = ((hash >>> 0) / 0xffffffff - 0.5) * 0.04;
+  const longitudeOffset = ((Math.imul(hash ^ 0x9e3779b9, 16777619) >>> 0) / 0xffffffff - 0.5) * 0.04;
+  return [latitudeOffset, longitudeOffset];
+}
 
 // GET /api/crime
 crimeRouter.get('/', asyncHandler(async (req, res) => {
@@ -31,8 +41,14 @@ crimeRouter.post('/', authMiddleware, adminMiddleware, async (req, res) => {
     let lng = Number(longitude);
     if (isNaN(lat) || isNaN(lng)) {
       const locMeta = resolveLocationMetadata(location);
-      lat = locMeta.lat + (Math.random() - 0.5) * 0.04;
-      lng = locMeta.lng + (Math.random() - 0.5) * 0.04;
+      if (!locMeta) {
+        return res.status(404).json({ error: 'Location not found in our supported destinations' });
+      }
+      const [latitudeOffset, longitudeOffset] = stableIncidentOffset(
+        `${location.trim().toLowerCase()}|${crimeType.trim().toLowerCase()}|${date || ''}|${time || ''}|${description || ''}`
+      );
+      lat = locMeta.lat + latitudeOffset;
+      lng = locMeta.lng + longitudeOffset;
     }
 
     const created = await db.addCrimeData({

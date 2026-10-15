@@ -67,11 +67,11 @@ export const ExplainableAI: React.FC<ExplainableAIProps> = ({
               <Sparkles className="w-4 h-4" />
             </span>
             <h3 className="text-lg font-bold text-slate-100">
-              Explainable AI (XAI): Why is this location risky?
+              Explainable Risk Score: Why is this location risky?
             </h3>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Machine Learning factor decomposition explaining predictive weights for {destination}.
+            Rule-based factor breakdown for {destination}, using the NCRB 2022 baseline and selected travel context.
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export const ExplainableAI: React.FC<ExplainableAIProps> = ({
                       {item.factor}
                     </h4>
                     <span className="text-[11px] text-slate-400 font-mono">
-                      Weight contribution: +{item.scoreContribution} pts
+                      Weight contribution: {item.scoreContribution >= 0 ? '+' : ''}{item.scoreContribution.toFixed(1)} pts
                     </span>
                   </div>
                 </div>
@@ -128,7 +128,7 @@ export const ExplainableAI: React.FC<ExplainableAIProps> = ({
       <div className="mt-5 p-3.5 rounded-xl bg-slate-900/50 border border-slate-700/40 flex items-start gap-3 text-xs text-slate-400">
         <HelpCircle className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
         <p className="leading-relaxed">
-          <strong className="text-slate-300 font-medium">Explainable Machine Learning Transparency:</strong> “Risk score = NCRB crime baseline + time, weather, transport and group factors. Each factor’s contribution is shown above.”
+          <strong className="text-slate-300 font-medium">Scoring method:</strong> “Risk score = NCRB 2022 crime baseline + selected time, weather, transport and group context. Weights are expert judgments, not learned from training data.”
         </p>
       </div>
     </div>

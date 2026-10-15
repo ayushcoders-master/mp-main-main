@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { db, IEmergencyService } from '../db.js';
-import { resolveLocationMetadata } from '../ml.js';
+import { resolveLocationMetadata } from '../riskModel.js';
 import { asyncHandler } from '../asyncHandler.js';
 import { authMiddleware, adminMiddleware } from '../auth.js';
 
@@ -17,6 +17,9 @@ emergencyRouter.get('/nearby', asyncHandler(async (req, res) => {
   const { location } = req.query;
   const locStr = typeof location === 'string' && location.trim() ? location.trim() : 'Delhi';
   const locMeta = resolveLocationMetadata(locStr);
+  if (!locMeta) {
+    return res.status(404).json({ error: 'Location not found in our supported destinations' });
+  }
 
   let services = await db.getEmergencyServicesByLocation(locStr);
 
@@ -113,12 +116,15 @@ emergencyRouter.post('/', authMiddleware, adminMiddleware, async (req, res) => {
     }
 
     const locMeta = resolveLocationMetadata(location);
+    if (!locMeta && (!Number.isFinite(Number(latitude)) || !Number.isFinite(Number(longitude)))) {
+      return res.status(404).json({ error: 'Location not found in our supported destinations' });
+    }
     const created = await db.addEmergencyService({
       name: name.trim(),
       type: type || 'police',
       location: location.trim(),
-      latitude: Number(latitude) || locMeta.lat,
-      longitude: Number(longitude) || locMeta.lng,
+      latitude: Number(latitude) || locMeta?.lat || 0,
+      longitude: Number(longitude) || locMeta?.lng || 0,
       contact: contact ? contact.trim() : '112',
       address: address ? address.trim() : `${location} Central`,
       emergencyAvailability: emergencyAvailability || '24/7'

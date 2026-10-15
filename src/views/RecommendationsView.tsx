@@ -94,7 +94,7 @@ export const RecommendationsView: React.FC = () => {
           <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
             <Sparkles className="w-5 h-5" />
           </div>
-          <span>AI Safety Advisory & Traveler Intelligence</span>
+          <span>Traveler Safety Guidance</span>
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
           Specialized risk mitigation protocols tailored for diverse traveler profiles, day/night cycles, and common tourist scams.

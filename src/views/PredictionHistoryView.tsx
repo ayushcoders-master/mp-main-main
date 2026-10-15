@@ -80,7 +80,7 @@ export const PredictionHistoryView: React.FC = () => {
             <span>My Safety Predictions</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Persisted travel evaluations computed by the XGBoost & Random Forest ensemble.
+            Saved travel evaluations from the explainable, rule-based risk scoring model.
           </p>
         </div>
 

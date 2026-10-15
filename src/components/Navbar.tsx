@@ -9,7 +9,6 @@ import {
   Sparkles,
   History,
   LayoutDashboard,
-  Shield,
   User,
   LogOut,
   Menu,
@@ -48,25 +47,25 @@ export const Navbar: React.FC = () => {
   }
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800">
+    <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-md border-b border-slate-800/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo & Tagline */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-base sm:text-lg tracking-tight text-white group-hover:text-cyan-400 transition-colors">
-                  TouristSafety<span className="text-cyan-400">AI</span>
-                </span>
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-semibold uppercase">
-                  ML
+            <img
+              src="/tripshield-emblem.png"
+              alt=""
+              className="h-11 w-11 shrink-0 rounded-xl border border-cyan-500/30 object-cover shadow-lg shadow-cyan-500/15 transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105"
+            />
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 leading-none">
+                <span className="font-black text-base sm:text-lg tracking-tight text-cyan-400">AI</span>
+                <span className="font-bold text-base sm:text-lg tracking-tight text-white transition-colors group-hover:text-cyan-100">
+                  TripShield
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 hidden sm:block tracking-wide font-medium">
-                Predicting travel risk before you arrive.
+              <p className="mt-1 text-[9px] font-semibold uppercase text-slate-400 hidden sm:block">
+                Travel safety, made clearer
               </p>
             </div>
           </Link>
@@ -83,7 +82,7 @@ export const Navbar: React.FC = () => {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     active
                       ? 'bg-slate-800 text-cyan-400 border border-slate-700 shadow-sm'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                      : 'text-slate-300 hover:bg-cyan-400 hover:text-slate-950'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -168,7 +167,7 @@ export const Navbar: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300 hover:bg-cyan-400 hover:text-slate-950 transition-colors"
                 >
                   Sign In
                 </Link>
@@ -209,7 +208,7 @@ export const Navbar: React.FC = () => {
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium ${
                   active
                     ? 'bg-slate-800 text-cyan-400 border border-slate-700'
-                    : 'text-slate-300 hover:bg-slate-800/60'
+                    : 'text-slate-300 hover:bg-cyan-400 hover:text-slate-950'
                 }`}
               >
                 <Icon className="w-4 h-4" />

@@ -243,7 +243,7 @@ export const SafetyMap: React.FC<SafetyMapProps> = ({
         const marker = L.marker([crime.latitude, crime.longitude], { icon: crimeIcon }).addTo(groups.crime);
         marker.bindPopup(`
           <div class="p-2 text-slate-800 font-sans min-w-[220px]">
-            <span class="inline-block px-2 py-0.5 text-[10px] uppercase font-bold bg-rose-100 text-rose-800 rounded mb-1">Documented Crime Incident</span>
+            <span class="inline-block px-2 py-0.5 text-[10px] uppercase font-bold bg-rose-100 text-rose-800 rounded mb-1">Reported Crime Incident</span>
             <h4 class="font-bold text-sm text-slate-900">${crime.crimeType}</h4>
             <p class="text-xs text-slate-600 mt-1">${crime.description}</p>
             <div class="mt-2 pt-1 border-t border-slate-200 text-xs">
@@ -334,6 +334,11 @@ export const SafetyMap: React.FC<SafetyMapProps> = ({
         </div>
 
         <div className="space-y-1.5">
+          {crimeData.length > 0 && (
+            <p className="border-b border-slate-700/70 pb-2 mb-2 text-[10px] leading-relaxed text-amber-300">
+              Approximate / simulated incident positions
+            </p>
+          )}
           {showLocationMarker && <label className="flex items-center justify-between gap-3 text-slate-300 hover:text-white cursor-pointer select-none">
             <span className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
